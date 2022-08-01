@@ -35,7 +35,6 @@ public class Scrapper {
         }
         if (!pagNav.hasText())//single page
             return 1;
-        System.out.println(pagNav.eachText().get(1));
         return Integer.parseInt(pagNav.eachText().get(1));
         /*eachText returns list of string containing text of current and last page
         Accessed text of last page with get(10,then parsed*/
@@ -45,33 +44,45 @@ public class Scrapper {
         Elements noOfJobs = doc.getElementsByClass("h6");
         String no = noOfJobs.get(0).text().substring(21);
         return Integer.parseInt(no);
-    }*///finds total no of jobs, could be used for quality assurance
+    }*///finds total no of jobs, could be used for quality assurance?
 
     public static List<Job> scrapCurrent(Document doc){
+        List<Job> jobsInAPage = new ArrayList<>();
+
         Elements jobTitle = doc.getElementsByClass("text-primary font-weight-bold media-heading h4");
 
         Elements companyName = doc.select("h3");
         Elements logoURL = doc.getElementsByClass("border p-1");
-        Elements location = doc.getElementsByClass("location font-12");
 
         Elements deadline = doc.getElementsByClass("text-primary mb-0");
-
         int noOfElements = jobTitle.size();
 
-        List<Job> jobsInAPage = new ArrayList<>();
+        Elements blocks = doc.getElementsByClass("col-8 col-lg-9 col-md-9 pl-3 pl-md-0 text-left");
 
         for (int i = 0;i<noOfElements;i++) {
-            String[] data = new String[]{jobTitle.get(i).text(),companyName.get(i).attr("title"),
-                    logoURL.get(i).attr("abs:src"),location.get(i).text(),
+            String[] data = new String[]{
+                    jobTitle.get(i).text(),
+                    companyName.get(i).attr("title"),
+                    logoURL.get(i).attr("abs:src"),
                     deadline.get(i).select("meta").attr("content")};
 
             Company company = new Company();
             Job job = new Job();
 
+            if(blocks.get(i).getElementsByClass("location font-12").size()==0){
+                company.setLocation("Not Provided.");
+            }else{
+                company.setLocation(blocks.get(i).
+                        getElementsByClass("location font-12").get(0).
+                        select("meta").attr("content"));
+                /*each entry is in a block(line 60).
+                Enter the block (line 75)
+                and search specifically the class of location(line 76).
+                Access "content" attribute(line 77).*/
+            }
+
             int j = 0;
             for (String datum : data) {
-                if (datum.length() == 0)
-                    datum = "Not Provided";
                 switch (j){
                     case 0:
                         job.setName(datum);
@@ -83,9 +94,6 @@ public class Scrapper {
                         company.setLogoUrl(datum);
                         break;
                     case 3:
-                        company.setLocation(datum);
-                        break;
-                    case 4:
                         job.setDeadline(datum);
                         break;
                 }
