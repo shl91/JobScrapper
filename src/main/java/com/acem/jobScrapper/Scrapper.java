@@ -12,6 +12,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.jsoup.nodes.Element;
 
+import static java.lang.System.exit;
+
 
 public class Scrapper {
     public static Document getDoc(String url) {
@@ -32,20 +34,15 @@ public class Scrapper {
         /* current and last page are in this class. Filtered them out. */
         if (!pagNav.hasText())//single page
             return 1;
-        System.out.println(pagNav.hasText());
         String no = pagNav.eachText().get(pagNav.eachText().size() - 1);
         return Integer.parseInt(no);
-
     }
 
-    public static void getNoOfJobs(Document doc){
+    /*public static int getNoOfJobs(Document doc){
         Elements noOfJobs = doc.getElementsByClass("h6");
-        System.out.println(noOfJobs.get(0).text());
-        String no = noOfJobs.get(0).
-        System.out.println(Integer.parseInt(no));
-
-
-    }
+        String no = noOfJobs.get(0).text().substring(21);
+        return Integer.parseInt(no);
+    }*/
 
     public static List<Job> scrapCurrent(Document doc){
         Elements jobTitle = doc.getElementsByClass("text-primary font-weight-bold media-heading h4");

@@ -13,17 +13,18 @@ import static com.acem.jobScrapper.Scrapper.getDoc;
 
 public class App {
     public static void main(String[] args) {
-        String url = Url.getUrl();
-        Document document = getDoc(url);
-        Scrapper.getNoOfJobs(document);
-        /*List<Job> finalList = Scrapper.scrapAll();
+        List<Job> finalList = Scrapper.scrapAll();
+        int round = finalList.size();
+
         ObjectMapper mapper = new ObjectMapper();
-        try {
-            String jsonString = mapper.writeValueAsString(finalList);
-            System.out.println(jsonString);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }*/
+        for (int i = 0; i < round; i++) {
+            try {
+                String jsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(finalList.get(i));
+                System.out.println(jsonString);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }
 

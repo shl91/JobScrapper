@@ -4,8 +4,9 @@ import java.util.Date;
 
 public class Job {
     private String name;
-    private Company company;
     private String deadline;
+    private Company company;
+
 
     public String getDeadline() {
         return deadline;
