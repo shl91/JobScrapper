@@ -28,16 +28,19 @@ public class Scrapper {
 
     public static int getNoOfPages(Document doc){
         Elements pagNav = doc.getElementsByClass("page-item ");
-        /* Portal and data of current and last page are in this class. Filtered them out. */
-        if (pagNav.isEmpty()){
+        Elements checkNoJob = doc.getElementsByClass("h6");
+        /* Portal and data of current and last page are in this class. Filtered them out.
+        We know this list has only two elements.*/
+        if (checkNoJob.size()<7){
             System.out.println("No job offer under that title.\nTry Another.");
+            /*In case no entry*/
             return 0;
         }
-        if (!pagNav.hasText())//single page
+        if (pagNav.isEmpty())//single page
             return 1;
         return Integer.parseInt(pagNav.eachText().get(1));
-        /*eachText returns list of string containing text of current and last page
-        Accessed text of last page with get(10,then parsed*/
+        /*eachText returns list of string containing text of current and last page.
+        Accessed text of last page with get(1),then parsed*/
     }
 
     /*public static int getNoOfJobs(Document doc){
@@ -51,24 +54,30 @@ public class Scrapper {
 
         Elements jobTitle = doc.getElementsByClass("text-primary font-weight-bold media-heading h4");
 
-        Elements companyName = doc.select("h3");
         Elements logoURL = doc.getElementsByClass("border p-1");
 
         Elements deadline = doc.getElementsByClass("text-primary mb-0");
-        int noOfElements = jobTitle.size();
+        int noOfElements = jobTitle.size();//Minimum requirement to offer job.
 
         Elements blocks = doc.getElementsByClass("col-8 col-lg-9 col-md-9 pl-3 pl-md-0 text-left");
 
         for (int i = 0;i<noOfElements;i++) {
             String[] data = new String[]{
                     jobTitle.get(i).text(),
-                    companyName.get(i).attr("title"),
                     logoURL.get(i).attr("abs:src"),
                     deadline.get(i).select("meta").attr("content")};
 
             Company company = new Company();
             Job job = new Job();
 
+            //for name of company
+            if(blocks.get(i).select("h3").size()==0){
+                company.setName("Not Provided.");
+            }else{
+                company.setName(blocks.get(i).select("h3").attr("title"));
+            }
+
+            //for location
             if(blocks.get(i).getElementsByClass("location font-12").size()==0){
                 company.setLocation("Not Provided.");
             }else{
@@ -88,12 +97,9 @@ public class Scrapper {
                         job.setName(datum);
                         break;
                     case 1:
-                        company.setName(datum);
-                        break;
-                    case 2:
                         company.setLogoUrl(datum);
                         break;
-                    case 3:
+                    case 2:
                         job.setDeadline(datum);
                         break;
                 }
