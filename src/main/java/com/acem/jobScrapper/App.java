@@ -1,6 +1,7 @@
 package com.acem.jobScrapper;
 
 import java.io.IOException;
+import java.util.Scanner;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -9,18 +10,22 @@ import org.jsoup.select.Elements;
 
 public class App {
     public static void main(String[] args) {
-            try {
-                Document document = Jsoup.connect("https://merojob.com/search/?q=java")
-                        .timeout(5000)
-                        .get();
+        String url = Url.getUrl();
+        Document document = Scrapper.getDoc(url);
+        int rounds = Scrapper.getNoOfPages(document);
+        System.out.println(rounds);
+        Scrapper.scrapCurrent(document);
+        for(int i = 2; i<=rounds;i++){
 
-                Element content = document.getElementById("content");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+
         }
 
     }
+
+
+    }
+
+
 
 
 
