@@ -1,0 +1,13 @@
+if (location.size()<6){
+                Elements blocks = doc.getElementsByClass("col-8 col-lg-9 col-md-9 pl-3 pl-md-0 text-left");
+                System.out.println(blocks.size());
+                for (int j = 0;j<noOfElements;j++){
+//System.out.println(blocks.get(j).getElementsByClass("location font-12").size());
+                    if(blocks.get(j).getElementsByClass("location font-12").size()==0){
+                        company.setLocation(blank);
+                    }else{
+//System.out.println(blocks.get(j).getElementsByClass("location font-12").get(0).select("meta").attr("content"));
+company.setLocation(blocks.get(j).getElementsByClass("location font-12").get(0).select("meta").attr("content"));
+                }
+            }
+            }

@@ -2,7 +2,6 @@ package com.acem.jobScrapper;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import com.acem.jobScrapper.dataTemplate.Company;
@@ -10,9 +9,7 @@ import com.acem.jobScrapper.dataTemplate.Job;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-import org.jsoup.nodes.Element;
 
-import static java.lang.System.exit;
 
 
 public class Scrapper {
@@ -31,18 +28,24 @@ public class Scrapper {
 
     public static int getNoOfPages(Document doc){
         Elements pagNav = doc.getElementsByClass("page-item ");
-        /* current and last page are in this class. Filtered them out. */
+        /* Portal and data of current and last page are in this class. Filtered them out. */
+        if (pagNav.isEmpty()){
+            System.out.println("No job offer under that title.\nTry Another.");
+            return 0;
+        }
         if (!pagNav.hasText())//single page
             return 1;
-        String no = pagNav.eachText().get(pagNav.eachText().size() - 1);
-        return Integer.parseInt(no);
+        System.out.println(pagNav.eachText().get(1));
+        return Integer.parseInt(pagNav.eachText().get(1));
+        /*eachText returns list of string containing text of current and last page
+        Accessed text of last page with get(10,then parsed*/
     }
 
     /*public static int getNoOfJobs(Document doc){
         Elements noOfJobs = doc.getElementsByClass("h6");
         String no = noOfJobs.get(0).text().substring(21);
         return Integer.parseInt(no);
-    }*/
+    }*///finds total no of jobs, could be used for quality assurance
 
     public static List<Job> scrapCurrent(Document doc){
         Elements jobTitle = doc.getElementsByClass("text-primary font-weight-bold media-heading h4");
@@ -95,14 +98,19 @@ public class Scrapper {
         return jobsInAPage;
     }
 
-    public static List<Job> scrapAll(){
-        List<Job> processing,ultimateList;
+    public static List<Job> scrapAll() {
+        List<Job> processing, ultimateList;
+        int rounds;
+        Document document;
+        String url;
 
-        String url = Url.getUrl();
-        Document document = getDoc(url);
+        do {
+            url = Url.getUrl();
+            document = getDoc(url);
+            rounds = getNoOfPages(document);
+        } while (rounds == 0);
 
-        int rounds = Scrapper.getNoOfPages(document);
-        if (rounds ==1)
+        if (rounds == 1)
             return scrapCurrent(document);
 
         ultimateList = scrapCurrent(document);
@@ -111,8 +119,8 @@ public class Scrapper {
         stringBuilder.append(url);
         stringBuilder.append("&page=");
 
-        for(int i = 2; i<=rounds;i++){
-            document = getDoc(String.valueOf(stringBuilder)+i);
+        for (int i = 2; i <= rounds; i++) {
+            document = getDoc(String.valueOf(stringBuilder) + i);
             processing = scrapCurrent(document);
             ultimateList.addAll(processing);
         }

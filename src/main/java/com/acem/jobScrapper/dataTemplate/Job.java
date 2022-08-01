@@ -1,6 +1,5 @@
 package com.acem.jobScrapper.dataTemplate;
 
-import java.util.Date;
 
 public class Job {
     private String name;
