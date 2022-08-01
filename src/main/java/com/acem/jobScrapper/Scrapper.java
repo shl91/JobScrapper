@@ -32,62 +32,94 @@ public class Scrapper {
         /* current and last page are in this class. Filtered them out. */
         if (!pagNav.hasText())//single page
             return 1;
+        System.out.println(pagNav.hasText());
         String no = pagNav.eachText().get(pagNav.eachText().size() - 1);
         return Integer.parseInt(no);
 
     }
 
-    public static void scrapCurrent(Document doc){
+    public static void getNoOfJobs(Document doc){
+        Elements noOfJobs = doc.getElementsByClass("h6");
+        System.out.println(noOfJobs.get(0).text());
+        String no = noOfJobs.get(0).
+        System.out.println(Integer.parseInt(no));
 
+
+    }
+
+    public static List<Job> scrapCurrent(Document doc){
         Elements jobTitle = doc.getElementsByClass("text-primary font-weight-bold media-heading h4");
 
         Elements companyName = doc.select("h3");
-
         Elements logoURL = doc.getElementsByClass("border p-1");
         Elements location = doc.getElementsByClass("location font-12");
 
         Elements deadline = doc.getElementsByClass("text-primary mb-0");
 
+        int noOfElements = jobTitle.size();
 
-        Elements[] data = new Elements[] {jobTitle,companyName,location};
-
-       int noOfElements = jobTitle.size();
-
-       List<Job> jobsInAPage = new ArrayList<>();
+        List<Job> jobsInAPage = new ArrayList<>();
 
         for (int i = 0;i<noOfElements;i++) {
+            String[] data = new String[]{jobTitle.get(i).text(),companyName.get(i).attr("title"),
+                    logoURL.get(i).attr("abs:src"),location.get(i).text(),
+                    deadline.get(i).select("meta").attr("content")};
+
             Company company = new Company();
             Job job = new Job();
 
-            if(!jobTitle.get(i).hasText()) {
-                job.setName("Not Provided");
-            }else{
-                job.setName(jobTitle.get(i).text());
+            int j = 0;
+            for (String datum : data) {
+                if (datum.length() == 0)
+                    datum = "Not Provided";
+                switch (j){
+                    case 0:
+                        job.setName(datum);
+                        break;
+                    case 1:
+                        company.setName(datum);
+                        break;
+                    case 2:
+                        company.setLogoUrl(datum);
+                        break;
+                    case 3:
+                        company.setLocation(datum);
+                        break;
+                    case 4:
+                        job.setDeadline(datum);
+                        break;
+                }
+                j++;
             }
-
-
-            company.setName(companyName.get(i).attr("title"));
-            company.setLogoUrl(logoURL.get(i).attr("abs:src"));
-            company.setLocation(location.get(i).text());
-
-            job.setDeadline(deadline.get(i).select("meta").attr("content"));
-
-
             job.setCompany(company);
 
             jobsInAPage.add(job);
-
         }
-        System.out.println(jobsInAPage);
+        return jobsInAPage;
+    }
 
+    public static List<Job> scrapAll(){
+        List<Job> processing,ultimateList;
 
+        String url = Url.getUrl();
+        Document document = getDoc(url);
 
-       /*for (int i = 0;i<noOfElements;i++){
-           job.setName(jobTitles.text());
-           company.setName(companyName.text());
-       }*/
+        int rounds = Scrapper.getNoOfPages(document);
+        if (rounds ==1)
+            return scrapCurrent(document);
 
+        ultimateList = scrapCurrent(document);
 
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(url);
+        stringBuilder.append("&page=");
+
+        for(int i = 2; i<=rounds;i++){
+            document = getDoc(String.valueOf(stringBuilder)+i);
+            processing = scrapCurrent(document);
+            ultimateList.addAll(processing);
+        }
+        return ultimateList;
     }
 
 }

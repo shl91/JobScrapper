@@ -1,29 +1,31 @@
 package com.acem.jobScrapper;
 
-import java.io.IOException;
-import java.util.Scanner;
 
-import org.jsoup.Jsoup;
+import com.acem.jobScrapper.dataTemplate.Job;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
+
+
+import java.util.List;
+
+import static com.acem.jobScrapper.Scrapper.getDoc;
 
 public class App {
     public static void main(String[] args) {
         String url = Url.getUrl();
-        Document document = Scrapper.getDoc(url);
-        int rounds = Scrapper.getNoOfPages(document);
-        System.out.println(rounds);
-        Scrapper.scrapCurrent(document);
-        for(int i = 2; i<=rounds;i++){
-
-
-        }
-
+        Document document = getDoc(url);
+        Scrapper.getNoOfJobs(document);
+        /*List<Job> finalList = Scrapper.scrapAll();
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            String jsonString = mapper.writeValueAsString(finalList);
+            System.out.println(jsonString);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }*/
     }
-
-
-    }
+}
 
 
 
