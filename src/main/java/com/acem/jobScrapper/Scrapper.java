@@ -28,11 +28,11 @@ public class Scrapper {
 
     public static int getNoOfPages(Document doc){
         Elements pagNav = doc.getElementsByClass("page-item ");
-        Elements checkNoJob = doc.getElementsByClass("h6");
         /* Portal and data of current and last page are in this class. Filtered them out.
         We know this list has only two elements.*/
+        Elements checkNoJob = doc.getElementsByClass("h6");
         if (checkNoJob.size()<7){
-            System.out.println("No job offer under that title.\nTry Another.");
+            System.out.println("No job offers under that title.\nTry Another.");
             /*In case no entry*/
             return 0;
         }
@@ -43,11 +43,11 @@ public class Scrapper {
         Accessed text of last page with get(1),then parsed*/
     }
 
-    /*public static int getNoOfJobs(Document doc){
+    public static int getNoOfJobs(Document doc){
         Elements noOfJobs = doc.getElementsByClass("h6");
         String no = noOfJobs.get(0).text().substring(21);
         return Integer.parseInt(no);
-    }*///finds total no of jobs, could be used for quality assurance?
+    }
 
     public static List<Job> scrapCurrent(Document doc){
         List<Job> jobsInAPage = new ArrayList<>();
@@ -123,6 +123,8 @@ public class Scrapper {
             document = getDoc(url);
             rounds = getNoOfPages(document);
         } while (rounds == 0);
+
+        System.out.println("No of jobs found:"+getNoOfJobs(document));
 
         if (rounds == 1)
             return scrapCurrent(document);
